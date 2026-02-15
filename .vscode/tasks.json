@@ -10,7 +10,11 @@
             "group": {
                 "kind": "build",      // ビルドタスクとして認識させる
                 "isDefault": true     // Cmd + Shift + B で即実行
-              }
+              },
+            "presentation": {
+                "reveal": "silent",
+                "focus": false
+            }
         },
         {
             "label": "nim: build current file (for debugging)",
