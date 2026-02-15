@@ -1,0 +1,3 @@
+#/usr/bin/bash
+/home/kemuniku/atcoder/cplib/tools/expander.o Main.nim -l:/home/kemuniku/atcoder/cplib/ -l:/home/kemuniku/atcoder/Nim-ACL/ -s
+nim cpp -d:release --opt:speed --multimethods:on --warning[SmallLshouldNotBeUsed]:off --hints:off -o:a.out combined.nim && oj t && oj s combined.nim -l 6072

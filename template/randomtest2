@@ -1,0 +1,6 @@
+#/usr/bin/bash
+nim cpp -o:makerandom.out makerandom.nim
+oj g/i -j 1 -t 2.0 --hack-actual "./a.out" "./makerandom.out" 1#/usr/bin/bash
+/home/kemuniku/atcoder/cplib/tools/expander.o Main.nim -l:/home/kemuniku/atcoder/cplib/ -l:/home/kemuniku/atcoder/Nim-ACL/ -s
+cat combined.nim | xsel --clipboard --input
+nim cpp -d:release --opt:speed --multimethods:on --warning[SmallLshouldNotBeUsed]:off --hints:off -o:a.out combined.nim && oj t 

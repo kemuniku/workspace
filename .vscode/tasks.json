@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "/home/kemuniku/.nimble/bin/nim cpp -d:debug --opt:speed --multimethods:on -o:${fileDirname}/a.out ${file}",
+            "group": {
+                "kind": "build",      // ビルドタスクとして認識させる
+                "isDefault": true     // Cmd + Shift + B で即実行
+              }
+        },
+        {
+            "label": "nim: build current file (for debugging)",
+            "command": "nim",
+            "args": [
+                "compile",
+                "-g",
+                "--debugger:native",
+                "-o:${workspaceRoot}/bin/${fileBasenameNoExtension}",
+                "${relativeFile}"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "type": "shell",
+        }
+    ]
+}
