@@ -12,7 +12,32 @@
                 "isDefault": true     // Cmd + Shift + B で即実行
               },
             "presentation": {
-                "reveal": "silent",
+                "focus": false,
+                "reveal" : "silent"
+            }
+        },
+        {
+            "label": "oj_run",
+            "type": "shell",
+            "command": "/home/kemuniku/.nimble/bin/nim cpp -d:debug --opt:speed --multimethods:on -o:${fileDirname}/a.out ${file} && cd ${fileDirname} && /home/kemuniku/.local/bin/oj t",
+            "group": {
+                "kind": "build",
+              },
+            "presentation": {
+                "focus": false
+            }
+        },
+        {
+            "label": "oj_sub",
+            "type": "shell",
+            "command": "/home/kemuniku/atcoder/cplib/tools/expander.o ${fileBasename} -l:/home/kemuniku/atcoder/cplib/ -l:/home/kemuniku/atcoder/Nim-ACL/ -s && cat combined.nim | xsel --clipboard --input && /home/kemuniku/.nimble/bin/nim cpp -d:release --opt:speed --multimethods:on --warning[SmallLshouldNotBeUsed]:off --hints:off -o:a.out combined.nim && /home/kemuniku/.local/bin/oj t",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "group": {
+                "kind": "build"
+            },
+            "presentation": {
                 "focus": false
             }
         },
