@@ -55,6 +55,28 @@ def get_contest_data_from_json(input_url):
             cid = problem_to_contest[problem]
             problem_urls.append(f"https://atcoder.jp/contests/{cid}/tasks/{problem}")
         return contest_id, input_url, len(problems), problem_urls, list(map(str, range(1, len(problems) + 1)))
+    elif "yukicoder.me" in parts:
+        #print("yukicoder")
+        cid = parts[parts.index("yukicoder.me") + 2]
+        contest_problem_json = requests.get(f"https://yukicoder.me/api/v1/contest/id/{cid}").json()
+        #print(contest_problem_json)
+        problems = contest_problem_json["Problems"]
+        problem_urls = []
+        for problem in problems:
+            #print(problem)
+            no = problem["No"]
+            problem_urls.append(f"https://yukicoder.me/problems/no/{no}")
+        problem_names = []
+        for i in range(len(problem_urls)):
+            n = i
+            name = ""
+            while True:
+                name = string.ascii_uppercase[n % 26] + name
+                n = n // 26 - 1
+                if n < 0:
+                    break
+            problem_names.append(name)
+        return contest_problem_json["Name"].replace(" ","_"),input_url,len(problems),problem_urls,problem_names
     else:
         print("コンテストの取得に失敗しました。")
         return None, None, None, None, None
@@ -120,8 +142,7 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
             {"name": "Library (src)", "path": cplib_path}
         ],
         "settings": {
-            "nim.buildCommand": "cpp",
-            "nim.buildOnSave": False
+            "nim.buildCommand": "cpp"
         }
     }
     workspace_path = os.path.join(base_dir, f"{contest_id}.code-workspace")
