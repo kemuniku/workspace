@@ -1,4 +1,0 @@
-#/usr/bin/bash
-/home/kemuniku/atcoder/cplib/tools/expander.o __mainname__ -l:/home/kemuniku/atcoder/cplib/ -l:/home/kemuniku/atcoder/Nim-ACL/ -s
-cat combined.nim | xsel --clipboard --input
-nim cpp -d:release --opt:speed --multimethods:on --warning[SmallLshouldNotBeUsed]:off --hints:off -o:a.out combined.nim && oj t 

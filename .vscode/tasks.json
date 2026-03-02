@@ -28,9 +28,23 @@
             }
         },
         {
-            "label": "oj_sub",
+            "label": "oj_subc",
             "type": "shell",
             "command": "/home/kemuniku/atcoder/cplib/tools/expander.o ${fileBasename} -l:/home/kemuniku/atcoder/cplib/ -l:/home/kemuniku/atcoder/Nim-ACL/ -s && cat combined.nim | xsel --clipboard --input && /home/kemuniku/.nimble/bin/nim cpp -d:release --opt:speed --multimethods:on --warning[SmallLshouldNotBeUsed]:off --hints:off -o:a.out combined.nim && /home/kemuniku/.local/bin/oj t",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "group": {
+                "kind": "build"
+            },
+            "presentation": {
+                "focus": false
+            }
+        },
+        {
+            "label": "oj_sub",
+            "type": "shell",
+            "command": "/home/kemuniku/atcoder/cplib/tools/expander.o ${fileBasename} -l:/home/kemuniku/atcoder/cplib/ -l:/home/kemuniku/atcoder/Nim-ACL/ -s && /home/kemuniku/.nimble/bin/nim cpp -d:release --opt:speed --multimethods:on --warning[SmallLshouldNotBeUsed]:off --hints:off -o:a.out combined.nim && /home/kemuniku/.local/bin/oj t && /home/kemuniku/.local/bin/oj s combined.nim -l 6072 -y -w 0 --no-open && ./next_prob.sh ${fileBasenameNoExtension}",
             "options": {
                 "cwd": "${fileDirname}"
             },
@@ -55,6 +69,20 @@
                 "cwd": "${workspaceRoot}"
             },
             "type": "shell",
+        },
+        {
+            "label": "Open Next Problem",
+            "type": "shell",
+            "command": "${workspaceRoot}/next_prob.sh",
+            "problemMatcher": [],
+            "args": [
+                "${fileBasenameNoExtension}"
+            ],
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "clear": true
+            }
         }
     ]
 }

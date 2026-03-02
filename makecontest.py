@@ -163,12 +163,57 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
             f.write(f"cd {p_name} && oj d {problem_urls[i]}; cd ..\n")
     os.chmod(dlall_path, 0o755)
     
+    dlopen_path = os.path.join(base_dir, "dlopen")
+    with open(dlopen_path, "w") as f:
+        f.write("#!/bin/bash\n\n")
+        f.write(f'cmd.exe /c start "" "{problem_urls[0]}" >/dev/null 2>&1 \n')
+        for i, p_name in enumerate(problem_names):
+            f.write(f"code ./{p_name}/{p_name}.nim\n")
+        f.write(f"code ./{problem_names[0]}/{problem_names[0]}.nim\n")
+        for i, p_name in enumerate(problem_names):
+            f.write(f"cd {p_name} && oj d {problem_urls[i]}; cd ..\n")
+    os.chmod(dlopen_path, 0o755)
+    
     suball_path = os.path.join(base_dir, "suball")
     with open(suball_path, "w") as f:
         f.write("#!/bin/bash\n\n")
         for p_name in problem_names:
             f.write(f"cd {p_name} && ./sub && cd ..\n")
     os.chmod(suball_path, 0o755)
+# === ここから追加: next_prob.sh の作成 (動的取得版) ===
+    next_prob_path = os.path.join(base_dir, "next_prob.sh")
+    with open(next_prob_path, "w", encoding="utf-8") as f:
+        f.write("#!/bin/bash\n\n")
+        
+        # URLとディレクトリ名の配列をシェルスクリプトに埋め込む
+        urls_str = " ".join([f'"{u}"' for u in problem_urls])
+        dirs_str = " ".join([f'"{d}"' for d in problem_names])
+        f.write(f'URLS=({urls_str})\n')
+        f.write(f'DIRS=({dirs_str})\n\n')
+        
+        # VS Codeから渡された現在開いているファイル名（拡張子なし）を取得
+        f.write('CURRENT_PROB="$1"\n')
+        f.write('NEXT_IDX=0\n\n')
+        
+        # 現在の問題が配列の何番目かを探す
+        f.write('for i in "${!DIRS[@]}"; do\n')
+        f.write('    if [[ "${DIRS[$i]}" == "$CURRENT_PROB" ]]; then\n')
+        f.write('        NEXT_IDX=$((i + 1))\n')
+        f.write('        break\n')
+        f.write('    fi\n')
+        f.write('done\n\n')
+        
+        # 最後の問題だったら最初に戻る
+        f.write('if [ "$NEXT_IDX" -ge "${#DIRS[@]}" ]; then\n')
+        f.write('    NEXT_IDX=0\n')
+        f.write('fi\n\n')
+        
+        f.write('echo "Opening problem: ${DIRS[$NEXT_IDX]}"\n')
+        f.write('cmd.exe /c start "" "${URLS[$NEXT_IDX]}" >/dev/null 2>&1 \n')
+        f.write('code -g "./${DIRS[$NEXT_IDX]}/${DIRS[$NEXT_IDX]}.nim:99999"\n')
+    os.chmod(next_prob_path, 0o755)
+    # === 追加ここまで ===
+    # === 追加ここまで ===
 
     # 5. VS Codeでワークスペースを開く
     try:
