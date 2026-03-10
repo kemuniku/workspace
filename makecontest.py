@@ -54,7 +54,17 @@ def get_contest_data_from_json(input_url):
         for problem in problems:
             cid = problem_to_contest[problem]
             problem_urls.append(f"https://atcoder.jp/contests/{cid}/tasks/{problem}")
-        return contest_id, input_url, len(problems), problem_urls, list(map(str, range(1, len(problems) + 1)))
+        problem_names = []
+        for i in range(len(problem_urls)):
+            n = i
+            name = ""
+            while True:
+                name = string.ascii_uppercase[n % 26] + name
+                n = n // 26 - 1
+                if n < 0:
+                    break
+            problem_names.append(name)
+        return contest_id, input_url, len(problems), problem_urls, problem_names
     elif "yukicoder.me" in parts:
         #print("yukicoder")
         cid = parts[parts.index("yukicoder.me") + 2]
@@ -210,7 +220,7 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
         
         f.write('echo "Opening problem: ${DIRS[$NEXT_IDX]}"\n')
         f.write('cmd.exe /c start "" "${URLS[$NEXT_IDX]}" >/dev/null 2>&1 \n')
-        f.write('code -g "./${DIRS[$NEXT_IDX]}/${DIRS[$NEXT_IDX]}.nim:99999"\n')
+        f.write('code -g "' + base_dir + '/${DIRS[$NEXT_IDX]}/${DIRS[$NEXT_IDX]}.nim:99999"\n')
     os.chmod(next_prob_path, 0o755)
     # === 追加ここまで ===
     # === 追加ここまで ===

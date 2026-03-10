@@ -44,7 +44,7 @@
         {
             "label": "oj_sub",
             "type": "shell",
-            "command": "/home/kemuniku/atcoder/cplib/tools/expander.o ${fileBasename} -l:/home/kemuniku/atcoder/cplib/ -l:/home/kemuniku/atcoder/Nim-ACL/ -s && /home/kemuniku/.nimble/bin/nim cpp -d:release --opt:speed --multimethods:on --warning[SmallLshouldNotBeUsed]:off --hints:off -o:a.out combined.nim && /home/kemuniku/.local/bin/oj t && /home/kemuniku/.local/bin/oj s combined.nim -l 6072 -y -w 0 --no-open && ./next_prob.sh ${fileBasenameNoExtension}",
+            "command": "/home/kemuniku/atcoder/cplib/tools/expander.o ${fileBasename} -l:/home/kemuniku/atcoder/cplib/ -l:/home/kemuniku/atcoder/Nim-ACL/ -s && /home/kemuniku/.nimble/bin/nim cpp -d:release --opt:speed --multimethods:on --warning[SmallLshouldNotBeUsed]:off --hints:off -o:a.out combined.nim && /home/kemuniku/.local/bin/oj t && /home/kemuniku/.local/bin/oj s combined.nim -l 6072 -y -w 0 --no-open && ${workspaceRoot}/next_prob.sh ${fileBasenameNoExtension}",
             "options": {
                 "cwd": "${fileDirname}"
             },
