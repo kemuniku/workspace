@@ -8,7 +8,6 @@ import json
 import requests
 from dotenv import load_dotenv
 
-# .envからREVEL_SESSIONを取得
 load_dotenv()
 
 def get_contest_data_from_json(input_url):
@@ -92,13 +91,13 @@ def get_contest_data_from_json(input_url):
         return None, None, None, None, None
 
 def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_names):
-    working_dir = os.path.dirname(os.path.abspath(__file__))
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    working_dir = os.path.dirname(os.path.realpath(__file__))
+    script_dir = os.path.dirname(os.path.realpath(__file__))
     
     base_dir = os.path.join(working_dir, "contests", contest_id)
     template_dir = os.path.join(script_dir, "template")
     dot_vscode_src = os.path.join(script_dir, ".vscode")
-    cplib_path = "/home/kemuniku/atcoder/cplib/src" 
+    cplib_path = os.getenv("CPLIB_PATH")
 
     if not os.path.exists(template_dir):
         print(f"Error: {template_dir} が見つかりません。")
