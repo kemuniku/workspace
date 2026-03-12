@@ -7,8 +7,10 @@ import sys
 import json
 import requests
 from dotenv import load_dotenv
-
-load_dotenv()
+real_script_path = os.path.realpath(__file__)
+script_dir = os.path.dirname(real_script_path)
+dotenv_path = os.path.join(script_dir, '.env')
+load_dotenv(dotenv_path)
 
 def get_contest_data_from_json(input_url):
     parts = input_url.strip().rstrip('/').split('/')
@@ -98,7 +100,7 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
     template_dir = os.path.join(script_dir, "template")
     dot_vscode_src = os.path.join(script_dir, ".vscode")
     cplib_path = os.getenv("CPLIB_PATH")
-
+    nimacl_path = os.getenv("NIM_ACL_PATH")
     if not os.path.exists(template_dir):
         print(f"Error: {template_dir} が見つかりません。")
         return
@@ -143,6 +145,22 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
     if os.path.exists(dot_vscode_src):
         target_vscode = os.path.join(base_dir, ".vscode")
         shutil.copytree(dot_vscode_src, target_vscode, dirs_exist_ok=True)
+        # .vscodeをコピーしたのちに、置き換え処理を行う。
+        for root, dirs, files in os.walk(target_vscode):
+            for file_name in files:
+                file_path = os.path.join(root, file_name)
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                    
+                    # 置換処理 (例: __mainname__ -> A.nim)
+                    if "__cplibpath__" in content or "__nimacl__" in content:
+                        new_content = content.replace("__cplibpath__", cplib_path).replace("__nimacl__",nimacl_path)
+                        with open(file_path, "w", encoding="utf-8") as f:
+                            f.write(new_content)
+                except Exception as e:
+                    # バイナリファイル等で読み込めない場合はスキップ
+                    pass
 
     # 3. マルチワークスペースファイル作成
     workspace_data = {
