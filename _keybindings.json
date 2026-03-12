@@ -1,0 +1,18 @@
+[
+{
+    "key": "ctrl+r",
+    "command": "workbench.action.tasks.runTask",
+    "when": "editorTextFocus && resourceExtname =~ /\\.nim/",
+    "args": "oj_run"
+},{
+    "key": "ctrl+shift+r",
+    "command": "workbench.action.tasks.runTask",
+    "when": "editorTextFocus && resourceExtname =~ /\\.nim/",
+    "args": "oj_subc"
+},{
+    "key": "ctrl+shift+t",
+    "command": "workbench.action.tasks.runTask",
+    "when": "editorTextFocus && resourceExtname =~ /\\.nim/",
+    "args": "oj_sub"
+}
+]
