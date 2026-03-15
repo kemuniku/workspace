@@ -166,7 +166,7 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
     workspace_data = {
         "folders": [
             {"name": f"Contest: {contest_id}", "path": "."},
-            {"name": "Library (src)", "path": cplib_path}
+            {"name": "Library (src)", "path": cplib_path + "/src"}
         ],
         "settings": {
             "nim.buildCommand": "cpp"
