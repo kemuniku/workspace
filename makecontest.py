@@ -37,10 +37,10 @@ def get_contest_data_from_json(input_url):
                     if n < 0:
                         break
                 problem_names.append(name)
-            return contest_id, f"https://atcoder.jp/contests/{contest_id}", len(task_info), problem_urls, problem_names
+            return contest_id, f"https://atcoder.jp/contests/{contest_id}", len(task_info), problem_urls, problem_names, None
         except Exception as e:
             print(f"JSON取得エラー: {e}")
-            return None, None, None, None, None
+            return None, None, None, None, None, None
     elif "kenkoooo.com" in parts and "contest" in parts:
         contest_problem_json = requests.get("https://kenkoooo.com/atcoder/resources/contest-problem.json").json()
         problem_to_contest = {}
@@ -55,17 +55,9 @@ def get_contest_data_from_json(input_url):
         for problem in problems:
             cid = problem_to_contest[problem]
             problem_urls.append(f"https://atcoder.jp/contests/{cid}/tasks/{problem}")
-        problem_names = []
-        for i in range(len(problem_urls)):
-            n = i
-            name = ""
-            while True:
-                name = string.ascii_uppercase[n % 26] + name
-                n = n // 26 - 1
-                if n < 0:
-                    break
-            problem_names.append(name)
-        return contest_id, input_url, len(problems), problem_urls, problem_names
+        problem_names = [str(i + 1) for i in range(len(problem_urls))]
+        nim_names = [f"Main_{i + 1}" for i in range(len(problem_urls))]
+        return contest_id, input_url, len(problems), problem_urls, problem_names, nim_names
     elif "yukicoder.me" in parts:
         #print("yukicoder")
         cid = parts[parts.index("yukicoder.me") + 2]
@@ -87,12 +79,12 @@ def get_contest_data_from_json(input_url):
                 if n < 0:
                     break
             problem_names.append(name)
-        return contest_problem_json["Name"].replace(" ","_"),input_url,len(problems),problem_urls,problem_names
+        return contest_problem_json["Name"].replace(" ","_"),input_url,len(problems),problem_urls,problem_names,None
     else:
         print("コンテストの取得に失敗しました。")
-        return None, None, None, None, None
+        return None, None, None, None, None, None
 
-def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_names):
+def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_names, nim_names=None):
     working_dir = os.path.dirname(os.path.realpath(__file__))
     script_dir = os.path.dirname(os.path.realpath(__file__))
     
@@ -108,8 +100,9 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
     # 1. 各問題フォルダ作成とテンプレート処理
     for i in range(num_problems):
         name = problem_names[i]
+        nim_name = nim_names[i] if nim_names else name
         target_path = os.path.join(base_dir, name)
-        new_main_filename = f"{name}.nim"
+        new_main_filename = f"{nim_name}.nim"
         
         if os.path.exists(target_path):
             print(f"Skipped: '{name}' フォルダは既に存在するためスキップします。")
@@ -180,12 +173,14 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
     with open(os.path.join(base_dir, "config"), "w") as f:
         f.write(f"CONTEST_ID: {contest_id}\nURL: {contest_url}\n")
 
+    _nim_names = nim_names if nim_names else problem_names
+
     dlall_path = os.path.join(base_dir, "dlall")
     with open(dlall_path, "w") as f:
         f.write("#!/bin/bash\n\n")
-        for p_name in problem_names:
-            f.write(f"code ./{p_name}/{p_name}.nim\n")
-        f.write(f"code ./{problem_names[0]}/{problem_names[0]}.nim\n")
+        for i, p_name in enumerate(problem_names):
+            f.write(f"code ./{p_name}/{_nim_names[i]}.nim\n")
+        f.write(f"code ./{problem_names[0]}/{_nim_names[0]}.nim\n")
         for i, p_name in enumerate(problem_names):
             f.write(f"cd {p_name} && oj d {problem_urls[i]}; cd ..\n")
     os.chmod(dlall_path, 0o755)
@@ -195,8 +190,8 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
         f.write("#!/bin/bash\n\n")
         f.write(f'cmd.exe /c start "" "{problem_urls[0]}" >/dev/null 2>&1 \n')
         for i, p_name in enumerate(problem_names):
-            f.write(f"code ./{p_name}/{p_name}.nim\n")
-        f.write(f"code ./{problem_names[0]}/{problem_names[0]}.nim\n")
+            f.write(f"code ./{p_name}/{_nim_names[i]}.nim\n")
+        f.write(f"code ./{problem_names[0]}/{_nim_names[0]}.nim\n")
         for i, p_name in enumerate(problem_names):
             f.write(f"cd {p_name} && oj d {problem_urls[i]}; cd ..\n")
     os.chmod(dlopen_path, 0o755)
@@ -215,8 +210,10 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
         # URLとディレクトリ名の配列をシェルスクリプトに埋め込む
         urls_str = " ".join([f'"{u}"' for u in problem_urls])
         dirs_str = " ".join([f'"{d}"' for d in problem_names])
+        nims_str = " ".join([f'"{n}"' for n in _nim_names])
         f.write(f'URLS=({urls_str})\n')
-        f.write(f'DIRS=({dirs_str})\n\n')
+        f.write(f'DIRS=({dirs_str})\n')
+        f.write(f'NIMS=({nims_str})\n\n')
         
         # VS Codeから渡された現在開いているファイル名（拡張子なし）を取得
         f.write('CURRENT_PROB="$1"\n')
@@ -237,7 +234,7 @@ def setup_contest(contest_id, contest_url, num_problems, problem_urls, problem_n
         
         f.write('echo "Opening problem: ${DIRS[$NEXT_IDX]}"\n')
         f.write('cmd.exe /c start "" "${URLS[$NEXT_IDX]}" >/dev/null 2>&1 \n')
-        f.write('code -g "' + base_dir + '/${DIRS[$NEXT_IDX]}/${DIRS[$NEXT_IDX]}.nim:99999"\n')
+        f.write('code -g "' + base_dir + '/${DIRS[$NEXT_IDX]}/${NIMS[$NEXT_IDX]}.nim:99999"\n')
     os.chmod(next_prob_path, 0o755)
     # === 追加ここまで ===
     # === 追加ここまで ===
