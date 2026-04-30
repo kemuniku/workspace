@@ -1,3 +1,4 @@
 #/usr/bin/bash
-
-oj g/i -j 20 --hack-actual "./a.out" "./makerandom.out" 1
+nim cpp -o:run.out __mainname__
+nim cpp -o:makerandom.out makerandom.nim
+oj g/i -j 20 --hack-actual "./run.out" "nim r makerandom.nim" 1
